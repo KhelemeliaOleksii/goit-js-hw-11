@@ -1,6 +1,13 @@
-import {api} from './api'
+import { requestToAPI } from './api'
 
-export function print() {
-    console.log('API url:', api.url);
-    console.log('API key:', api.key); 
+const axios = require('axios');
+
+export async function request(searchFor) {
+    try {
+        const response = await axios.get(requestToAPI.getRequestURL(searchFor));
+        console.log(response.data);
+        return response.data
+    } catch (error) {
+        console.error(error);
+    }
 }
