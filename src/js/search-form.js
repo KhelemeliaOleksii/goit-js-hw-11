@@ -1,18 +1,13 @@
-import {request} from './api/fetch'
-import photoCardTmpl from '../templates/photo-card.hbs'
-// Описан в документации
-import SimpleLightbox from 'simplelightbox';
-// Дополнительный импорт стилей
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import { requestDataHandler } from './api/fetch'
 
 class searchValue {
     constructor() {
-        this.value = '';        
+        this.value = '';
     }
     static checkInputValue(data) {
         const tmpValue = data.replace(/^\s+|\s+$/gm, '');
         const arrayValue = [...tmpValue];
-        const min = 2;
+        const min = 1;
         const max = 100;
         if (arrayValue.length <= min || arrayValue.length > max) {
             return false;
@@ -35,39 +30,39 @@ class searchValue {
 
 export class searchForm extends searchValue {
     form;
+    loadMoreBtn;
     constructor() {
         super();
         this.form = document.querySelector('#search-form');
-        this.form.addEventListener('submit', this.submitListener);
+        this.form.addEventListener('submit', this.formSubmitListener);
+        this.loadMoreBtn = document.querySelector('.load-more');
+        //this.toggleVisibility(this.loadMoreBtn);
+        searchForm.unvisible(this.loadMoreBtn);
+        // this.loadMoreBtn.classList.toggle('unvisible')
+        this.loadMoreBtn.addEventListener('click', this.loadmoreSubmitListener);
     }
-    submitListener(event) {
+    formSubmitListener(event) {
+        const isNeedToSavePreviousSearchResult = false;
         event.preventDefault();
-        const searchInput = event.currentTarget.querySelector("input"); 
+        const searchInput = event.currentTarget.querySelector("input");
         if (!searchValue.checkInputValue.call(searchValue, searchInput.value)) {
             return;
         }
-        request(searchValue.getValue())
-        .then( (response) => {
-            markupHandler(response.data);
-            return response.data.hits;}
-        )
-    }
-}
-//const form = new searchForm(); 
-function markupHandler(data) {
-    const gallery = document.querySelector(".gallery");
-    console.log(data.totalHits);
-    
-    if (!data.totalHits) {
-        return
-    }
-    const markup = data.hits
-        .map((item)=> photoCardTmpl(item))
-        .join('');
-    console.log(markup);
-    gallery.innerHTML=markup;
-    var lightbox = new SimpleLightbox('.gallery a', {close:true});
+        
+        requestDataHandler(searchValue.getValue(), isNeedToSavePreviousSearchResult);
+        //searchForm.visible(document.querySelector('.load-more'));
 
+    }
+    loadmoreSubmitListener() {
+        const isNeedToSavePreviousSearchResult = true;
+        requestDataHandler(searchValue.getValue(), isNeedToSavePreviousSearchResult);
+    }
+    static unvisible (elementDOM) {
+        elementDOM.classList.add('unvisible');
+    }
+    static visible (elementDOM) {
+        elementDOM.classList.remove('unvisible');
+    }
 }
 
 // export const searchForm = {
@@ -89,7 +84,7 @@ function markupHandler(data) {
 //         if (!searchForm.checkInputValue.apply(searchForm, [str])) {
 //             return;
 //         }
-//         // searchForm.getValue.apply(searchForm,null);    
+//         // searchForm.getValue.apply(searchForm,null);
 //         //console.log(searchForm.getValue.apply(searchForm,null));
 //         request(searchForm.getValue());
 

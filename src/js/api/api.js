@@ -1,23 +1,39 @@
-const searchValue = "cat";
-//const requestURL = "";
-export const requestToAPI = {
-    requestURL: '',
+//  requestToAPI
+//  details see on: https://pixabay.com/api/docs/
+//have: -properties:
+//          >requestFullUrl
+//          >url
+//          >key
+//          >parameters{}
+//              <>image_type
+//              <>orientation
+//              <>safesearch
+//              <>page
+//              <>per_page              
+//      -methods:
+//          >getRequestURL
+//          income: search value
+export const requestURLToAPI = {
+    requestFullUrl: '',
     url: "https://pixabay.com/api/",
     key: "25644315-7f91ee10a75849531df6442ba",
     parameters: {
         image_type: "photo",
         orientation: "horizontal",
         safesearch: true,
+        page: 1,
+        per_page: 40,
     },
-    // filterFields : ["webformatURL", "largeImageURL", "tags",
-    // "likes", "views", "comments", "downloads"],
+    //create string request type:
+    //https://pixabay.com/api/?key=25644315-7f91ee10a75849531df6442ba&q=yellow+flowers&image_type=photo
+    //q - search value
     getRequestURL(value) {
-        this.requestURL += `${this.url}?key=${this.key}&q=${value}`;
+        //console.log(this.parameters.page);
+        this.requestFullUrl += `${this.url}?key=${this.key}&q=${value}`;
         for (const property in this.parameters) {
-            this.requestURL += `&${property}=${this.parameters[property]}`
+            this.requestFullUrl += `&${property}=${this.parameters[property]}`
         }
-        //this.requestURL += `&fields=${this.filterFields.join()}`
-        return this.requestURL;
+        // console.log(this.requestFullUrl);
+        return this.requestFullUrl;
     },
-
 }

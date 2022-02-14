@@ -7,12 +7,14 @@
     background-color: #00008b;
     padding: 15px 0;
     justify-content: center;
+    margin-bottom: 15px;
     // align-items: center;
     // margin: 0 auto;
     & input {
         border-radius: 4px 0 0 4px;
         outline: none;
         border: none;
+        padding: 5px;
         // background-image: none;
         // background-color: transparent;
         -webkit-box-shadow: none;
@@ -24,16 +26,16 @@
         position: relative;
         border-radius: 0 4px 4px 0;
         // margin-left: -5px;
-        width: 25px;
-        height: 25px;
+        width: 35px;
+        height: 35px;
         // display
     }
     & button::before {
         content: "";
         position: absolute;
         // background-color: white;
-        top: 25%;
-        left: 25%;
+        top: 35%;
+        left: 35%;
         display: block;
         width: 13px;
         height: 13px;
