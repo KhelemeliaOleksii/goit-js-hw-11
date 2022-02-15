@@ -28,12 +28,10 @@ export const requestURLToAPI = {
     //https://pixabay.com/api/?key=25644315-7f91ee10a75849531df6442ba&q=yellow+flowers&image_type=photo
     //q - search value
     getRequestURL(value) {
-        //console.log(this.parameters.page);
         this.requestFullUrl += `${this.url}?key=${this.key}&q=${value}`;
         for (const property in this.parameters) {
             this.requestFullUrl += `&${property}=${this.parameters[property]}`
         }
-        // console.log(this.requestFullUrl);
         return this.requestFullUrl;
     },
 }
