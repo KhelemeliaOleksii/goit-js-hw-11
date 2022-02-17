@@ -10,23 +10,36 @@ methods:  -"formSubmitListener" is a callback function on "addEventListener"
              <>check this "search value".
              <>create request on API
  */
-export class searchForm extends searchValue {
-    form;
-    static isNeedToSavePreviousSearchResult = false;
-    constructor() {
-        super();
-        this.form = document.querySelector('#search-form');
-        this.form.addEventListener('submit', this.formSubmitListener);
+export class searchFormClass{
+    #searchValue
+    constructor({observerChangeOnSubmit}) {
+        this.refs = {
+            form : document.querySelector('#search-form'),
+        }
+        
+        this.onSubmit = observerChangeOnSubmit;
     }
-    formSubmitListener(event) {
-        event.preventDefault();
-        // get "search value" from "input"
-        const searchInput = event.currentTarget.querySelector("input");
-        //check this "search value".
-        if (!searchValue.checkInputValue.call(searchValue, searchInput.value)) {
+    get searchValue () {
+        return this.#searchValue;
+    }
+    set searchValue (value) {
+        if (!this.checkInputValue(value)) {
             return;
         }
-        //create request on API    
-        requestDataHandler(searchValue.getValue(), searchForm.isNeedToSavePreviousSearchResult);
+        this.#searchValue = value;
+        if (this.onSubmit) {
+            this.onSubmit(this.#searchValue);
+        }
     }
+    checkInputedDatas(data) {
+        const tmpValue = data.replace(/^\s+|\s+$/gm, '');
+        const arrayValue = [...tmpValue];
+        const min = 0;
+        const max = 100;
+        if (arrayValue.length <= min || arrayValue.length > max) {
+            return false;
+        }
+        this.#searchValue = tmpValue;
+        return true;
+    }   
 }

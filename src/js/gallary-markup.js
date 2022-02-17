@@ -12,12 +12,12 @@ import photoCardTmpl from '../templates/photo-card.hbs'
 //      -create markup of "div.gallery" with "photoCardTmpl" template
 //      -format "div.gallery" with help of "simplelightbox" libruary
 //incom:-object data 
-export function markupHandler(data, isNeedToSavePreviousResult) {
+export function markupHandler({totalHits = 0, hits = []}, isNeedToSavePreviousResult = false) {
     // pick out "div.gallery" where the gallery will be created
     const gallery = document.querySelector(".gallery");
     //if data to markup is empty(data.totalHits === 0)
     //-clear previous "div.gallery" content
-    if (!data.totalHits) {
+    if (!totalHits) {
         gallery.innerHTML = "";
         return
     }
@@ -25,14 +25,15 @@ export function markupHandler(data, isNeedToSavePreviousResult) {
     //-create markup with template "photoCardTmpl"
     //-add content to the end of "div.gallery"
     //-create "SimpleLightbox" gallary 
-    const markup = data.hits
+    const markup = hits
         .map((item) => photoCardTmpl(item))
         .join('');
+        // console.log(markup);
     if (isNeedToSavePreviousResult) {
         gallery.insertAdjacentHTML('beforeend', markup);
     } else {
         gallery.innerHTML = markup;
-        const lightbox = new SimpleLightbox('.gallery a', { close: true });
+        //const lightbox = new SimpleLightbox('.gallery a', { close: true });
         window.scroll({
             top: 0,
             behavior: 'smooth'

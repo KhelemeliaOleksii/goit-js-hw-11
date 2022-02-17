@@ -1,7 +1,9 @@
 
 export class searchValue {
+    value;
     constructor() {
         this.value = '';
+
     }
     static checkInputValue(data) {
         const tmpValue = data.replace(/^\s+|\s+$/gm, '');

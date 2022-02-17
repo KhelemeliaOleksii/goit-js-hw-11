@@ -34,4 +34,10 @@ export const requestURLToAPI = {
         }
         return this.requestFullUrl;
     },
+    setPageValue(value) {
+        this.parameters.page = value;
+    },
+    setPerPageValue(value) {
+        this.parameters.per_page = value;
+    },
 }
