@@ -88,7 +88,6 @@ function checkOnItem(totalItems, elementDOM) {
 }
 function checkIsThisLastPage(all, page = 1, perPage = PER_PAGE) {
     const hitsLeft = all - perPage * (page - 1);
-    console.log("hitsLeft", hitsLeft);
     if (hitsLeft <= perPage) {
         return true;
     }
@@ -108,24 +107,22 @@ function createObjInputedData(target) {
 function searchFormChangeHanler(searchValue) {
     console.log('searchFormChangeHanler. Look for: ', searchValue);
 }
-function loadMoreChangeHandler(searchValue, currentPage) {
+async function loadMoreChangeHandler(searchValue, currentPage) {
     console.log("searchValue on load more", searchValue);
     console.log("current page is", currentPage);
     const isNeedToSavePreviousResult = true;
-    // loadMore.increment();
-    // try {
-    //     // const currentPage = loadMore.
-    //     const searchFor = loadMore.value;
-    //     const result = await request({searchFor});   
-    //     const {totalHits, hits} = result.data;
-    //     markupHandler({ totalHits, hits }, isNeedToSavePreviousResult);
-    //     if (!checkIsThisLastPage(totalHits)) {
-    //         return;
-    //     }
-    //     console.log("It's over");
-    //     loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
+    try {
+        const result = await request({searchFor:searchValue, page:currentPage});   
+        const {totalHits, hits} = result.data;
+        markupHandler({ totalHits, hits }, isNeedToSavePreviousResult);
+        if (!checkIsThisLastPage(totalHits, currentPage)) {
+            console.log("It's not over");
+            return;
+        }
+        console.log("It's over");
+        loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
 
-    // } catch (error) {
-    //     console.log(error);
-    // }
+    } catch (error) {
+         console.log(error);
+    }
 }

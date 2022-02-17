@@ -11,10 +11,12 @@ const axios = require('axios');
 //out:  - if ok -> response type JSON
 //           error -> error
 export function request({ searchFor, page = 1, per_page = 40 }) {
-    requestURLToAPI.setPageValue = page;
-    requestURLToAPI.setPerPageValue = per_page;
+    requestURLToAPI.parameters.page = page;
+    requestURLToAPI.parameters.per_page = per_page;
 
     console.log("search for:", searchFor);
-    console.log(requestURLToAPI.getRequestURL(searchFor));
+//    console.log("search on: ", page,"page");
+
+    // console.log(requestURLToAPI.getRequestURL(searchFor));
     return axios.get(requestURLToAPI.getRequestURL(searchFor));
 }

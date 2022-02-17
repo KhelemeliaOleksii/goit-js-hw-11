@@ -12,7 +12,7 @@ import photoCardTmpl from '../templates/photo-card.hbs'
 //      -create markup of "div.gallery" with "photoCardTmpl" template
 //      -format "div.gallery" with help of "simplelightbox" libruary
 //incom:-object data 
-export function markupHandler({totalHits = 0, hits = []}, isNeedToSavePreviousResult = false) {
+export function markupHandler({ totalHits = 0, hits = [] }, isNeedToSavePreviousResult = false) {
     // pick out "div.gallery" where the gallery will be created
     const gallery = document.querySelector(".gallery");
     //if data to markup is empty(data.totalHits === 0)
@@ -28,12 +28,18 @@ export function markupHandler({totalHits = 0, hits = []}, isNeedToSavePreviousRe
     const markup = hits
         .map((item) => photoCardTmpl(item))
         .join('');
-        // console.log(markup);
+
     if (isNeedToSavePreviousResult) {
         gallery.insertAdjacentHTML('beforeend', markup);
+        const { height: cardHeight } = gallery
+            .firstElementChild.getBoundingClientRect();
+        window.scrollBy({
+            top: cardHeight * 1.75,
+            behavior: 'smooth',
+        });
     } else {
         gallery.innerHTML = markup;
-        //const lightbox = new SimpleLightbox('.gallery a', { close: true });
+        const lightbox = new SimpleLightbox('.gallery a', { close: true });
         window.scroll({
             top: 0,
             behavior: 'smooth'
