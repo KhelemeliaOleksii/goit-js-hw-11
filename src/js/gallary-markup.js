@@ -7,42 +7,33 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 // import a markup template of a gallery photo card
 import photoCardTmpl from '../templates/photo-card.hbs'
 
-//markupHandler
-//do:   -select "div.gallery"
-//      -create markup of "div.gallery" with "photoCardTmpl" template
-//      -format "div.gallery" with help of "simplelightbox" libruary
-//incom:-object data 
-export function markupHandler({ totalHits = 0, hits = [] }, isNeedToSavePreviousResult = false) {
+/* 
+markupHandler
+do: -select "div.gallery"
+    -create markup of "div.gallery" with "photoCardTmpl" template
+    -format "div.gallery" with help of "simplelightbox" libruary
+in: - object {} of elements:
+        <> hits = []
+        <> "isNeedToSavePreviousResult = false"
+ */
+export function markupHandler({ hits = [],  isNeedToSavePreviousResult = false,} ) {
     // pick out "div.gallery" where the gallery will be created
     const gallery = document.querySelector(".gallery");
-    //if data to markup is empty(data.totalHits === 0)
-    //-clear previous "div.gallery" content
-    if (!totalHits) {
-        gallery.innerHTML = "";
-        return
-    }
-    //else data to markup is present (data.totalHits > 0)
+  
     //-create markup with template "photoCardTmpl"
     //-add content to the end of "div.gallery"
     //-create "SimpleLightbox" gallary 
     const markup = hits
         .map((item) => photoCardTmpl(item))
-        .join('');
-
+        .join('');   
+    
+    // if we need to save previous markup of the part of document use 
+    //     -insertAdjacentHTML
+    // else 
+    //     -innerHTML 
     if (isNeedToSavePreviousResult) {
         gallery.insertAdjacentHTML('beforeend', markup);
-        const { height: cardHeight } = gallery
-            .firstElementChild.getBoundingClientRect();
-        window.scrollBy({
-            top: cardHeight * 1.75,
-            behavior: 'smooth',
-        });
-    } else {
-        gallery.innerHTML = markup;
-        const lightbox = new SimpleLightbox('.gallery a', { close: true });
-        window.scroll({
-            top: 0,
-            behavior: 'smooth'
-        });
+        return;
     }
+    gallery.innerHTML = markup;
 }

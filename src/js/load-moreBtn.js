@@ -21,12 +21,12 @@ export class loadMoreClass {
     };
     set pageNumber(value) {
         this.#pageNumber = value;
-        if (this.onClick) {
-            this.onClick(this.searchValue, this.#pageNumber);
-        }
     } 
     increment () {
         this.pageNumber += 1;
+        if (this.onClick) {
+            this.onClick(this.searchValue, this.#pageNumber);
+        }
     }
     doVisibleRef(elementDOM) {
         if (!elementDOM.classList.contains("unvisible")) {

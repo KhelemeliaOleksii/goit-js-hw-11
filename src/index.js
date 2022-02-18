@@ -1,41 +1,40 @@
 import './sass/main.scss';
 
+//This part is predefined by GoIT
+// Описан в документации
+import SimpleLightbox from 'simplelightbox';
+// Дополнительный импорт стилей
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
+
 import { searchFormClass } from './js/search-form'
 import { loadMoreClass } from './js/load-moreBtn'
+
+// import {_} from 'lodash';
+
 import { request } from './js/api/fetch'
 import { markupHandler } from './js/gallary-markup'
-/* Форма изначально есть в HTML документе. 
-Пользователь будет вводить строку для поиска в текстовое поле, 
-а при сабмите формы необходимо выполнять HTTP-запрос.
- */
-/* 
-В HTML документе уже есть разметка кнопки при клике по которой 
-необходимо выполнять запрос за следующей группой изображений и 
-добавлять разметку к уже существующим элементам галереи. 
-
-    Изначально кнопка должна быть скрыта.
-    После первого запроса кнопка появляется в интерфейсе под галереей.
-    При повторном сабмите формы кнопка сначала прячется, а после запроса опять отображается.
-
-В ответе бэкенд возвращает свойство totalHits - общее количество изображений,
-которые подошли под критерий поиска (для бесплатного аккаунта). 
-Если пользователь дошел до конца коллекции, пряч кнопку и 
-выводи уведомление с текстом "We're sorry, but you've reached the end of search results.".*/
 
 const PER_PAGE = 40;
+// let isAvailable = true;
+
+// const container = document.querySelector('.container');
+
+const lightbox = new SimpleLightbox('.gallery a', { close: true });
+
 const searchForm = new searchFormClass({ observerChangeOnSubmit: searchFormChangeHanler })
 
 const loadMore = new loadMoreClass({ observerChangeOnClick: loadMoreChangeHandler });
+
 loadMore.refs.moreBtn.addEventListener('click', clickLoadMoreListener);
 function clickLoadMoreListener(event) {
     loadMore.increment();
-} 
+}
 
 searchForm.refs.form.addEventListener('submit', submitSearchFormListener);
 //console.log('name', searchForm.refs);
 
 async function submitSearchFormListener(event) {
-
     event.preventDefault();
 
     loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
@@ -56,18 +55,25 @@ async function submitSearchFormListener(event) {
         const result = await request({ searchFor });
 
         const { totalHits, hits } = result.data;
+
         if (!checkOnItem(totalHits, target)) {
             clearSearcher(target);
             console.log("Unfortunately! We find no hits!");
             return;
         }
 
-        markupHandler({ totalHits, hits })
+        markupHandler({hits})
+        lightbox.refresh();
+        window.scroll({
+            top: 0,
+            behavior: 'smooth'
+        });
 
         if (checkIsThisLastPage(totalHits)) {
             return;
         }
         loadMore.searchValue = searchFor;
+        loadMore.pageNumber = 1;
         loadMore.doVisibleRef(loadMore.refs.moreBtn);
 
     } catch (error) {
@@ -78,7 +84,6 @@ async function submitSearchFormListener(event) {
 function clearSearcher(elementDOM) {
     markupHandler({});
     elementDOM.reset();
-
 }
 function checkOnItem(totalItems, elementDOM) {
     if (totalItems <= 0) {
@@ -112,17 +117,33 @@ async function loadMoreChangeHandler(searchValue, currentPage) {
     console.log("current page is", currentPage);
     const isNeedToSavePreviousResult = true;
     try {
-        const result = await request({searchFor:searchValue, page:currentPage});   
-        const {totalHits, hits} = result.data;
-        markupHandler({ totalHits, hits }, isNeedToSavePreviousResult);
+        const result = await request({ searchFor: searchValue, page: currentPage });
+        
+        const { totalHits, hits } = result.data;
+        
+        markupHandler({hits, isNeedToSavePreviousResult});
+        
+        lightbox.refresh();
+        
+        const { height: cardHeight } = document
+            .querySelector('.gallery')
+            .firstElementChild.getBoundingClientRect();
+        window.scrollBy({
+            top: cardHeight * 2,
+            behavior: 'smooth',
+        });
+
+
         if (!checkIsThisLastPage(totalHits, currentPage)) {
             console.log("It's not over");
             return;
         }
+
         console.log("It's over");
+        
         loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
 
     } catch (error) {
-         console.log(error);
+        console.log(error);
     }
 }
