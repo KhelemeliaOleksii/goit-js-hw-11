@@ -11,7 +11,10 @@ import photoCardTmpl from '../templates/photo-card.hbs'
 markupHandler
 do: -select "div.gallery"
     -create markup of "div.gallery" with "photoCardTmpl" template
-    -format "div.gallery" with help of "simplelightbox" libruary
+    -if parameter "isNeedToSavePreviousResult" is true
+        use insertAdjacentHTML 
+    else
+        use innerHTML 
 in: - object {} of elements:
         <> hits = []
         <> "isNeedToSavePreviousResult = false"

@@ -27,9 +27,6 @@ export class searchFormClass{
             return;
         }
         this.#searchValue = value;
-        if (this.onSubmit) {
-            this.onSubmit(this.#searchValue);
-        }
     }
     checkInputedDatas(data) {
         const tmpValue = data.replace(/^\s+|\s+$/gm, '');
@@ -40,6 +37,9 @@ export class searchFormClass{
             return false;
         }
         this.#searchValue = tmpValue;
+        if (this.onSubmit) {
+            this.onSubmit(this.searchValue);
+        }
         return true;
     }   
 }

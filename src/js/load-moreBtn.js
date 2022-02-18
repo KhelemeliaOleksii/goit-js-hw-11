@@ -1,11 +1,17 @@
+/* 
+loadMoreClass 
+private properties(their getters and setters):
+    - #searchValue is what looking for
+    - #pageNumber is where looking for
+ */
 
 export class loadMoreClass {
     #searchValue;
     #pageNumber;
-    constructor({ observerChangeOnClick, initialPageNumber = 1}){
+    constructor({loadMoreChangeObserver, initialPageNumber = 1}){
+        
+        this.onClick = loadMoreChangeObserver;
         this.pageNumber = initialPageNumber;
-        // this.pageCount = totalPageCount;
-        this.onClick = observerChangeOnClick;
         this.refs = {
             moreBtn : document.querySelector(".load-more"),
         };
