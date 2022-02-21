@@ -1,3 +1,11 @@
+//////////////////////////////////////
+/* to perfome intersection observer 
+uncomment  strings:
+31-37
+185-188
+244-247
+*/
+
 import './sass/main.scss';
 
 //This part is predefined by GoIT
@@ -14,17 +22,36 @@ import { request } from './js/api/fetch'
 
 import { markupHandler } from './js/gallary-markup'
 
-import { message} from './js/messages'
+import { message } from './js/messages'
 
+// intersection observer
+// First we select the element we want to target
+const gallaryItems = document.getElementsByClassName('photo-link');
+
+/* //intersection observer
+const options = {
+    threshold: 1,
+}
+
+const observer = new IntersectionObserver(handleGalleryIntersection, options);
+ */
+
+//parameter of searching
 const PER_PAGE = 40;
 
+// gallery
 const lightbox = new SimpleLightbox('.gallery a', { close: true });
 
-const searchForm = new searchFormClass({ observerChangeOnSubmit: searchFormChangeHanler })
+// search form
+const searchForm = new searchFormClass({ observerChangeOnSubmit: searchFormChangeHanler });
 
+// additional button load more
 const loadMore = new loadMoreClass({ loadMoreChangeObserver: loadMoreChangeHandler });
 
+
 searchForm.refs.form.addEventListener('submit', submitSearchFormListener);
+
+loadMore.refs.moreBtn.addEventListener('click', clickLoadMoreListener);
 
 /* 
 submitSearchFormListener is callback function
@@ -40,7 +67,9 @@ do: - prevent default behaviour (post datas and reload page)
 function submitSearchFormListener(event) {
     //prevent default behaviour (post datas and reload page)
     event.preventDefault();
-    
+    // observer.unobserve(loadMore.refs.moreBtn);
+    loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
+
     // define target of "event"
     const { target } = event;
 
@@ -50,13 +79,11 @@ function submitSearchFormListener(event) {
     //verify validation of an inputed search value
     if (!searchForm.checkInputedDatas(searchFor)) {
         clearSearcher(target);
-        loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
+        // loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
         const msg = "Search field is empty. Input some value!"
-        message.info(msg); 
+        message.info(msg);
     }
 }
-
-loadMore.refs.moreBtn.addEventListener('click', clickLoadMoreListener);
 
 /* 
 clickLoadMoreListener - callback function
@@ -124,12 +151,9 @@ in: -"searchValue" is what we are looking for
  */
 async function searchFormChangeHanler(searchFor) {
     console.log('searchFormChangeHanler. Look for: ', searchFor);
-
-    loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
-
     try {
 
-        const result = await request({searchFor});
+        const result = await request({ searchFor })
 
         const { totalHits, hits } = result.data;
 
@@ -142,21 +166,26 @@ async function searchFormChangeHanler(searchFor) {
 
         const msg = `Hooray! We found ${totalHits} images.`;
         message.success(msg);
-        markupHandler({hits})
+        markupHandler({ hits })
         lightbox.refresh();
         window.scroll({
             top: 0,
             behavior: 'smooth'
         });
-
         if (checkIsThisLastPage(totalHits)) {
             const msg = "We're sorry, but you've reached the end of search results.";
             message.info(msg);
             return;
         }
+
         loadMore.searchValue = searchFor;
         loadMore.pageNumber = 1;
         loadMore.doVisibleRef(loadMore.refs.moreBtn);
+
+/*         const lastItem = gallaryItems.item(gallaryItems.length - 1);
+        if (lastItem) {
+            observer.observe(lastItem);
+        } */
 
     } catch (error) {
         console.log(error);
@@ -179,19 +208,21 @@ do: - create flag "isNeedToSavePreviousResult"
 async function loadMoreChangeHandler(searchValue, currentPage) {
     // create flag "isNeedToSavePreviousResult"
     const isNeedToSavePreviousResult = true;
-
     try {
+        // btn load more is disabled until body of this function will be done 
+        loadMore.refs.moreBtn.disabled = true;
+
         // provide get request to search "searchValue" on "currentPage" page
         const result = await request({ searchFor: searchValue, page: currentPage });
-        
+
         // rendering results of searching
-            //destruction of searching results
+        //destruction of searching results
         const { totalHits, hits } = result.data;
-            //perfome markup of searching results
-        markupHandler({hits, isNeedToSavePreviousResult});
-            //refresh lightbox gallary 
+        //perfome markup of searching results
+        markupHandler({ hits, isNeedToSavePreviousResult });
+        //refresh lightbox gallary 
         lightbox.refresh();
-            //shift window view on a new position
+        //shift window view on a new position
         const { height: cardHeight } = document
             .querySelector('.gallery')
             .firstElementChild.getBoundingClientRect();
@@ -199,17 +230,36 @@ async function loadMoreChangeHandler(searchValue, currentPage) {
             top: cardHeight * 2,
             behavior: 'smooth',
         });
+        // do btn load more disabled = false as body of this function have already be done 
+        loadMore.refs.moreBtn.disabled = false;
 
         // check "IsThisLastPage"
         if (checkIsThisLastPage(totalHits, currentPage)) {
             const msg = "We're sorry, but you've reached the end of search results.";
             message.info(msg);
-
             loadMore.doUnvisibleRef(loadMore.refs.moreBtn);
-
             return;
         }
+
+/*         const lastItem = gallaryItems.item(gallaryItems.length - 1);
+        if (lastItem) {
+            observer.observe(lastItem);
+        } */
+
     } catch (error) {
         console.log(error);
+    }
+}
+
+/* 
+handleGalleryIntersection
+do: -if entry.isIntersecting 
+        true:   <>stop observe (current target)
+                <>go to next page
+*/
+function handleGalleryIntersection([entry], observer) {
+    if (entry.isIntersecting) {
+        observer.unobserve(entry.target);
+        loadMore.increment();
     }
 }
